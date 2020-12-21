@@ -20,17 +20,60 @@ const screenshotPDF = async (page) => {
 	await page.pdf({ path: 'vudu-4k-movies.pdf', format: 'A4' })
 }
 
+
+async function autoScroll(page) {
+	await page.evaluate(async () => {
+		await new Promise((resolve, reject) => {
+			var totalHeight = 0;
+			var distance = 400;
+			var timer = setInterval(() => {
+				var scrollHeight = document.body.scrollHeight;
+				window.scrollBy(0, distance);
+				totalHeight += distance;
+
+				if (totalHeight >= scrollHeight) {
+					clearInterval(timer);
+					resolve();
+				}
+			}, 100);
+		});
+	});
+}
+
 const screenshotPNG = async (page) => {
 	// const page = await browser.newPage()
 	await page.goto('https://www.vudu.com/content/movies/uxrow/New-Rentals/53', { waitUntil: 'networkidle2' })
-	await page.waitForSelector('._2CCgL');        // wait for the selector to load
+
+	await autoScroll(page);
+	// await page.waitForSelector('._2CCgL');        // wait for the selector to load
+
 	await page.screenshot({ path: 'vudu-new-movies.png', fullPage: true });
+
+	// // Get the "viewport" of the page, as reported by the page.
+	// const dimensions = await page.evaluate(() => {
+	// 	return {
+	// 		width: document.documentElement.clientWidth,
+	// 		height: document.documentElement.clientHeight,
+	// 		deviceScaleFactor: window.devicePixelRatio
+	// 	};
+	// });
+	// console.log('Dimensions:', dimensions);
+
+	// const movies = await page.$eval("._2CCgL")
+	// const elem_dimensions = await movies.evaluate(() => {
+	// 	return {
+	// 		width: document.documentElement.clientWidth,
+	// 		height: document.documentElement.clientHeight,
+	// 		deviceScaleFactor: window.devicePixelRatio
+	// 	};
+	// });
+	// console.log('Dimensions:', elem_dimensions);
 }
 
 const main = async () => {
 	const browser = await puppeteer.launch({
 		args: ['--start-maximized'],
-		headless: false,
+		headless: true,
 		defaultViewport: null
 	})
 	const page = await browser.newPage()
@@ -38,7 +81,7 @@ const main = async () => {
 	try {
 		await screenshotPNG(page);
 		// await screenshotPDF(page);
-		await fbSign(page);
+		// await fbSign(page);
 	} catch (err) {
 		console.log("SCRIPT ERROR: (" + err.name + " - " + err.message + ")");
 		console.log(err);

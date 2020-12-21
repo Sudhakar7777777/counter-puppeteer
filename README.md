@@ -14,4 +14,9 @@ yarn test
 ## Puppeteer Scripts
 
 In the project directory, you can run:
+```
+node scripts/screenshot.js
+```
+
+Official Puppeteer documentation: [click here](https://pptr.dev/)
 
