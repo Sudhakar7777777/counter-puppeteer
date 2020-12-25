@@ -73,7 +73,7 @@ const screenshotPNG = async (page) => {
 const main = async () => {
 	const browser = await puppeteer.launch({
 		args: ['--start-maximized'],
-		headless: true,
+		headless: false,
 		defaultViewport: null
 	})
 	const page = await browser.newPage()
